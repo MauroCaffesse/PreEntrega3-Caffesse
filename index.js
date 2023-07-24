@@ -1,28 +1,52 @@
 // Algoritmo que calcula el precio final de cada producto y sus respectivas cuotas, dependiendo de la cantidad de cuotas elegida.
 
-let numProductos = Number(prompt('Ingrese cantidad de productos'));
+function pedirNumero(mensaje) {
+  const input = Number(prompt(mensaje));
+  if (isNaN(input)) {
+    return null;
+  } else {
+    return input;
+  }
+}
 
-if (isNaN(numProductos)) {
-  alert('Error: No ingresó un número');
-} else {
-  for (let i = 1; i <= numProductos ; i++) {
-    let precioProd = Number(prompt('Ingrese precio del producto'));
-    let cuotas = Number(prompt('Ingrese la cantidad de cuotas que desea realizar su compra'));
+function calcularInteres(precioProd, cuotas) {
+  if (cuotas >= 1 && cuotas <= 3) {
+    return { interes: 0, precioFinal: precioProd, precioCuota: precioProd / cuotas };
+  } else if (cuotas > 3 && cuotas <= 6) {
+    const precioFinal = precioProd * 1.1;
+    return { interes: 10, precioFinal: precioFinal, precioCuota: precioFinal / cuotas };
+  } else if (cuotas > 6 && cuotas <= 12) {
+    const precioFinal = precioProd * 1.2;
+    return { interes: 20, precioFinal: precioFinal, precioCuota: precioFinal / cuotas };
+  } else {
+    return { error: 'El límite de cuotas es 12' };
+  }
+}
 
-    if (isNaN(precioProd) || isNaN(cuotas)) {
+function calcularPreciosProductos(numProductos) {
+  for (let i = 1; i <= numProductos; i++) {
+    const precioProd = pedirNumero('Ingrese precio del producto');
+    const cuotas = pedirNumero('Ingrese la cantidad de cuotas que desea realizar su compra');
+
+    if (precioProd === null || cuotas === null) {
       alert('Error: No ingresó un número');
     } else {
-      if (cuotas >= 1 && cuotas <= 3) {
-        alert('Su compra no presenta interes' + '\n' + 'El precio final del producto es $' + precioProd + '\n' + 'Cada cuota es de $' + (precioProd / cuotas));
-      } else if (cuotas > 3 && cuotas <= 6) {
-        let precioFinal = precioProd * 1.1;
-        alert('Su compra presenta un interés del 10%' + '\n' + 'El precio final del producto es $' + precioFinal + '\n' + 'Cada cuota es de $' + (precioFinal / cuotas));
-      } else if (cuotas > 6 && cuotas <= 12) {
-        let precioFinal = precioProd * 1.2;
-        alert('Su compra presenta un interés del 20%' + '\n' + 'El precio final del producto es $' + precioFinal + '\n' + 'Cada cuota es de $' + (precioFinal / cuotas));
+      const resultado = calcularInteres(precioProd, cuotas);
+      if (resultado.error) {
+        alert(resultado.error);
       } else {
-        alert('El límite de cuotas es 12');
+        alert('Su compra presenta un interés del ' + resultado.interes + '%'
+          + '\n' + 'El precio final del producto es $' + resultado.precioFinal
+          + '\n' + 'Cada cuota es de $' + resultado.precioCuota);
       }
     }
   }
+}
+
+const numProductos = pedirNumero('Ingrese cantidad de productos');
+
+if (numProductos === null) {
+  alert('Error: No ingresó un número');
+} else {
+  calcularPreciosProductos(numProductos);
 }
