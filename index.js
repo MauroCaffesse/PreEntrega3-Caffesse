@@ -1,52 +1,152 @@
-// Algoritmo que calcula el precio final de cada producto y sus respectivas cuotas, dependiendo de la cantidad de cuotas elegida.
+let cliente;
+let direc;
 
-function pedirNumero(mensaje) {
-  const input = Number(prompt(mensaje));
-  if (isNaN(input)) {
-    return null;
-  } else {
-    return input;
-  }
+const carrito = [];
+const productos = [
+  { nombre: "Torta de Chocolate", precio: 15000 },
+  { nombre: "Cupcakes de Vainilla", precio: 2000 },
+  { nombre: "Croissants de Almendra", precio: 1500 },
+  { nombre: "Tarta de Frutas", precio: 10200 },
+  { nombre: "Galletas de Avena", precio: 800 },
+];
+
+function infoProducto(producto) {
+  alert(
+    `Usted seleccionó ${producto.nombre}, con un valor de $${producto.precio}.`
+  );
 }
 
-function calcularInteres(precioProd, cuotas) {
-  if (cuotas >= 1 && cuotas <= 3) {
-    return { interes: 0, precioFinal: precioProd, precioCuota: precioProd / cuotas };
-  } else if (cuotas > 3 && cuotas <= 6) {
-    const precioFinal = precioProd * 1.1;
-    return { interes: 10, precioFinal: precioFinal, precioCuota: precioFinal / cuotas };
-  } else if (cuotas > 6 && cuotas <= 12) {
-    const precioFinal = precioProd * 1.2;
-    return { interes: 20, precioFinal: precioFinal, precioCuota: precioFinal / cuotas };
+function datosPersonales() {
+  cliente = prompt(
+    "Bienvenido/a a La Pasteleria by Cande Leogrande ¿Cómo es su nombre?"
+  );
+
+  if (cliente === null) {
+    return;
   } else {
-    return { error: 'El límite de cuotas es 12' };
-  }
-}
-
-function calcularPreciosProductos(numProductos) {
-  for (let i = 1; i <= numProductos; i++) {
-    const precioProd = pedirNumero('Ingrese precio del producto');
-    const cuotas = pedirNumero('Ingrese la cantidad de cuotas que desea realizar su compra');
-
-    if (precioProd === null || cuotas === null) {
-      alert('Error: No ingresó un número');
-    } else {
-      const resultado = calcularInteres(precioProd, cuotas);
-      if (resultado.error) {
-        alert(resultado.error);
-      } else {
-        alert('Su compra presenta un interés del ' + resultado.interes + '%'
-          + '\n' + 'El precio final del producto es $' + resultado.precioFinal
-          + '\n' + 'Cada cuota es de $' + resultado.precioCuota);
+    while (cliente == "") {
+      cliente = prompt("Por favor, escriba de nuevo su nombre.");
+      if (cliente === null) {
+        return;
       }
     }
   }
+  alert("Bienvenido a la tienda, " + cliente);
+
+  direc = prompt("Por favor, confirme su dirección de envío.");
+
+  if (direc === null) {
+    return;
+  } else {
+    while (direc == "") {
+      direc = prompt("Por favor, escriba de nuevo su dirección.");
+      if (direc === null) {
+        return;
+      }
+    }
+  }
+  alert("Su dirección es " + direc);
 }
 
-const numProductos = pedirNumero('Ingrese cantidad de productos');
+function precioConInteres(precio, cuotas) {
+  if (cuotas === 1) {
+    return precio;
+  } else if (cuotas === 3) {
+    return precio * 1.05;
+  } else if (cuotas === 6) {
+    return precio * 1.1;
+  } else if (cuotas === 12) {
+    return precio * 1.3;
+  } else {
+    return null;
+  }
+}
 
-if (numProductos === null) {
-  alert('Error: No ingresó un número');
+function productoAlCarrito(producto) {
+  infoProducto(producto);
+  if (confirm("¿Desea agregarlo al carrito?")) {
+    carrito.push(producto);
+  } else {
+    alert("No se agregó el producto al carrito.");
+  }
+}
+
+function seleccionarProductos() {
+  do {
+    let selectProducto = Number(
+      prompt(
+        "Por favor, seleccione un producto del siguiente catálogo escribiendo el número de la lista:\n" +
+          productos
+            .map((producto, index) => `${index + 1} ${producto.nombre}`)
+            .join("\n")
+      )
+    );
+
+    if (selectProducto >= 1 && selectProducto <= productos.length) {
+      productoAlCarrito(productos[selectProducto - 1]);
+    } else {
+      alert("Por favor, ingrese un número válido.");
+    }
+  } while (confirm("¿Desea agregar otro producto al carrito?"));
+}
+
+function compraProductos() {
+  if (
+    confirm(
+      `Su carrito de compras tiene ${carrito.length} producto(s). ¿Desea proceder al pago?`
+    )
+  ) {
+    const total = carrito.reduce(
+      (acumulador, producto) => acumulador + producto.precio,
+      0
+    );
+
+    alert(`El costo total de los productos es de $${total}.`);
+
+    let cuotas;
+    do {
+      cuotas = parseInt(
+        prompt("Seleccione la cantidad de cuotas (1, 3, 6, 12):")
+      );
+      if (![1, 3, 6, 12].includes(cuotas)) {
+        alert("Por favor, seleccione una cantidad de cuotas válida.");
+      }
+    } while (![1, 3, 6, 12].includes(cuotas));
+
+    const totalConInteres = Math.round(precioConInteres(total, cuotas));
+
+    if (cuotas === 1) {
+      alert(`El valor total de la compra es de $${totalConInteres}.`);
+    } else {
+      alert(
+        `El valor total de la compra en ${cuotas} cuotas es de $${totalConInteres}.`
+      );
+    }
+
+    if (confirm(`¿Desea finalizar la compra?`)) {
+      alert(
+        `Los productos serán enviados a la dirección ${direc}. ¡Gracias por su compra, ${cliente}!`
+      );
+    } else {
+      alert("Usted canceló la transacción. ¡Lo esperamos pronto de vuelta!");
+      return;
+    }
+  } else {
+    alert("Usted canceló la transacción. ¡Lo esperamos pronto de vuelta!");
+    return;
+  }
+}
+
+datosPersonales();
+if (cliente != null && direc != null) {
+  seleccionarProductos();
+  if (carrito.length != 0) {
+    compraProductos();
+  } else {
+    alert(
+      "Usted no agregó ningún producto al carrito. ¡Lo esperamos pronto de vuelta!"
+    );
+  }
 } else {
-  calcularPreciosProductos(numProductos);
+  alert("Usted canceló la compra, ¡Lo esperamos pronto de vuelta!");
 }
